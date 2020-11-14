@@ -1,7 +1,7 @@
 # ColorDice
 Dado electrónico de colores con Arduino y LEDs y sistema inercial para detectar la cara que ha caido.
 
-##Electrónica
+## Electrónica
 
 - Arduino Nano
 - [Shield Arduino Nano](https://es.aliexpress.com/item/33063354279.html?spm=a2g0s.9042311.0.0.3c4463c0q9bBWU)
@@ -11,11 +11,14 @@ Dado electrónico de colores con Arduino y LEDs y sistema inercial para detectar
 - Pila 9V 
 
 ![NanoShield_b][NanoShield_b]
-![MPU9250_Library][MPU9250_Library]
+![MPU9250][MPU9250]
 ![Switch][Switch]
 
 
 ## Cableado
+
+Cada tira de Leds consiste en 4 LEDs que se conectarán a cada esquina de cada cara cuadrada. Cada una irá conectada con sus 3 cables al shield de Arduino con VCC y GND independiente.
+También conectaremos el botón entre la alimentación y la pila.
 
 ![Montaje Electrónico][MontajeNanoShieldWithMPU]
 
