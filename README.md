@@ -25,6 +25,7 @@ También conectaremos el botón entre la alimentación y la pila.
 ## Piezas
 
 ![Cubo_interno][cubo_interno]
+![Montaje de caras][Faces_Mount]
 
 ## Librerías necesarias
 
@@ -41,6 +42,8 @@ Se encuentran disponibles en el repositorio oficial de Arduino
 
 
 [cubo_interno]: /src/img/cubo_interno.jpg
+[Faces_Mount]: /src/img/FacesMount.png
+
 [MontajeNanoShieldWithMPU]: /src/img/CuboEmocionesNanoShieldWithMPU_bb.png
 [MPU9250]: /src/img/MPU9250.png
 [NanoShield_b]: /src/img/NanoShield_b.png
