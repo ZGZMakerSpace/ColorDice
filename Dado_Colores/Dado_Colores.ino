@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include <IMU_MPU9250.h>
+#include <MPU9250.h>
  
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -8,6 +8,7 @@
 
 
 #define    MPU9250_ADDRESS            0x68
+MPU9250 imu;
 
 #define LED_FACE1   2
 #define LED_FACE2   3
@@ -37,6 +38,7 @@ Adafruit_NeoPixel cube[6] = { face1, face2, face3, face4, face5, face6 };
 
 long colors[6] = { RED, ORANGE, YELLOW, WHITE, BLUE, GREEN };
 
+//-- Non blocking execution -----
 long debug_duration = 400;
 
 long duration = 300;
@@ -44,47 +46,40 @@ long last_time = 0;
 
 long debug_last_time = 0;
 
+long imu_duration = 30;
+long imu_time = 0;
+
 long bps = 9600;
 
-float threshold = 1;
+//--- Dice Face update
 int old_face = 1;
 int current_face = 1;
 
-MPU9250 imu;
  
 void updateIMU(){
- 
-  if (imu.readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01){   
-    imu.readAccelData(imu.accelCount);
-    imu.getAres();
- 
-    imu.ax = (float)imu.accelCount[0]*imu.aRes;
-    imu.ay = (float)imu.accelCount[1]*imu.aRes;
-    imu.az = (float)imu.accelCount[2]*imu.aRes;
-    imu.readGyroData(imu.gyroCount);
-    imu.getGres();
- 
-    imu.gx = (float)imu.gyroCount[0]*imu.gRes;
-    imu.gy = (float)imu.gyroCount[1]*imu.gRes;
-    imu.gz = (float)imu.gyroCount[2]*imu.gRes;
+  if ((millis() - imu_time ) > imu_duration ){
+    
+    imu_time = millis();
+    if ( imu.available() ){ 
+        imu.update();
+    }
   }
- 
-  imu.updateTime();
-  imu.delt_t = millis() - imu.count;
 }
-
 
  void AccDebug(){
 
    if ( millis() - debug_last_time > debug_duration){
+     float aX = imu.getAccX();
+     float aY = imu.getAccY();
+     float aZ = imu.getAccZ();
      Serial.print("Force \t X: ");
-     Serial.print(imu.ax);
+     Serial.print( aX );
      Serial.print(" \t Y: ");
-     Serial.print(imu.ay);
+     Serial.print( aY );
      Serial.print(" \t Z: ");
-     Serial.println(imu.az);
+     Serial.println( aZ );
      Serial.print("Max Value : ");
-     Serial.println( max( max ( abs(imu.ax), abs(imu.ay)), abs(imu.az) ));
+     Serial.println( max( max ( abs( aX ), abs( aY )), abs( aZ ) ));
      debug_last_time = millis();
   }
  };
@@ -92,26 +87,29 @@ void updateIMU(){
  void DetectFace(){
    
    if ( millis() - last_time > duration ){
-     float maxvalue = max( max ( abs(imu.ax), abs(imu.ay)), abs(imu.az) );
+     float aX = imu.getAccX();
+     float aY = imu.getAccY();
+     float aZ = imu.getAccZ();
+     float maxvalue = max( max ( abs (aX ), abs( aY ) ), abs( aZ ) );
      
-     if ( abs(imu.ax) == maxvalue ) {
-      if (imu.ax > 0){
+     if ( abs( aX ) == maxvalue ) {
+      if ( aX > 0){
         current_face = 1;
       }else{
         current_face = 6;
       } 
     }
       
-    if(  abs(imu.ay) == maxvalue ){
-      if (imu.ay > 0){
+    if(  abs( aY ) == maxvalue ){
+      if ( aY > 0){
         current_face = 2;
       }else{
         current_face = 5;
       } 
     }
       
-    if(  abs(imu.az)  == maxvalue ){
-      if (imu.az > 0){
+    if(  abs( aZ )  == maxvalue ){
+      if ( aZ  > 0){
         current_face = 3;
       }else{
         current_face = 4;
@@ -120,7 +118,7 @@ void updateIMU(){
       
       //Detect Face change
       if( current_face != old_face ){
-        Serial.print(" New Face ");Serial.print(current_face);
+        Serial.print(" Face ");Serial.println(current_face);
     
         cube[old_face-1].clear();
         cube[old_face-1].show();
@@ -151,7 +149,7 @@ void setup() {
   Serial.begin(bps);
   Serial.println("Dado Colores");
 
-  imu.initMPU9250();
+  imu.setup();
 
   //Setup cube LED Faces
   setupStripes();
