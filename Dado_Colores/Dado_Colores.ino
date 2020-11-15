@@ -38,18 +38,23 @@ Adafruit_NeoPixel cube[6] = { face1, face2, face3, face4, face5, face6 };
 
 long colors[6] = { RED, ORANGE, YELLOW, WHITE, BLUE, GREEN };
 
+//-------------------------------
 //-- Non blocking execution -----
-long debug_duration = 400;
+//-------------------------------
 
+long bps = 9600;
+
+// Update Detecting Faces
 long duration = 300;
 long last_time = 0;
 
-long debug_last_time = 0;
-
+// Update IMU
 long imu_duration = 30;
 long imu_time = 0;
 
-long bps = 9600;
+// Update Debug
+long debug_duration = 400;
+long debug_last_time = 0;
 
 //--- Dice Face update
 int old_face = 1;
@@ -60,9 +65,7 @@ void updateIMU(){
   if ((millis() - imu_time ) > imu_duration ){
     
     imu_time = millis();
-    if ( imu.available() ){ 
-        imu.update();
-    }
+    imu.update();
   }
 }
 
@@ -156,6 +159,7 @@ void setup() {
   
   //Initialize Variables
   last_time = millis();
+  imu_time = millis();
 }
 
 void loop() {
